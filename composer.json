@@ -1,0 +1,49 @@
+{
+    "name": "domatskiy/skyparkcdn",
+    "type": "library",
+    "description": "skyparkcdn",
+    "keywords": ["cdn", "skyparkcdn"],
+    "homepage": "https://github.com/domatskiy/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Evgeniy Domatskiy",
+            "role": "Developer"
+        }
+    ],
+    "repositories":[
+        {
+            "type":"git",
+            "url":"https://github.com/domatskiy/skyparkcdn"
+        },
+        {
+            "type":"package",
+            "package":{
+                "name":"domatskiy/skyparkcdn",
+                "version":"0.1.0",
+                "source":{
+                    "type":"git",
+                    "url":"https://github.com/domatskiy/skyparkcdn",
+                    "reference":"master"
+                }
+            }
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": { "Domatskiy\\SkyparkCDN\\": "src/" }
+        },
+    "autoload-dev": {
+        "psr-4": {
+            "Domatskiy\\Tests\\": "tests/"
+            }
+        },
+    "require": {
+        "php": ">=5.6.4",
+        "guzzlehttp/guzzle": "^6.2"
+        },
+    "require-dev": {
+        "phpunit/phpunit": "^5.4.0",
+        "piwik/ini": "^1.0"
+        }
+}
