@@ -46,7 +46,10 @@ class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
         $data = $response->getData();
         echo 'token: '.$data['token']."\n\n";
 
-        $result = $this->cdn->getBalance();
+        $result = $this->cdn
+            ->client()
+            ->getBalance();
+
         print_r($result);
 
         $this->assertEquals($result instanceof SkyparkCDN\RequestResult, true);
@@ -63,7 +66,10 @@ class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
         if(!isset($this->config['resource']['res_1']) && !$this->config['resource']['res_1'])
             throw new \Exception('no config res_1 for resource');
 
-        $result = $this->cdn->purgeAll($this->config['resource']['res_1']);
+        $result = $this->cdn
+            ->cache()
+            ->purgeAll($this->config['resource']['res_1']);
+
         $this->assertEquals($result instanceof SkyparkCDN\RequestResult, true);
 
         var_dump($result);
