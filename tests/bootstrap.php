@@ -1,4 +1,4 @@
 <?php
-namespace MediaSoft\Tests {
+namespace Domatskiy\Tests {
     require __DIR__ . '/../vendor/autoload.php';
 }

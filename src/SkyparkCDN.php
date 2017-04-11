@@ -1,18 +1,20 @@
 <?
 
-namespace Domatskiy\SMS;
+namespace Domatskiy;
 
 class SkyparkCDN
 {
     private $api_url = 'https://capi.skyparkcdn.ru/api/v1';
     private $token = '';
 
-    function __construct($resource_id)
+    function __construct()
     {
 
     }
 
     /**
+     * @param $method
+     * @param $url
      * @param array $data
      * @return RequestResult
      */
@@ -82,7 +84,7 @@ class SkyparkCDN
         return $result;
     }
 
-	 /**
+    /**
      * @param $login
      * @param $passw
      * @return RequestResult

@@ -1,27 +1,29 @@
 <?php
 namespace Domatskiy\Tests;
 
-//use Domatskiy\SkyparkCDN\Response;
-
 class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Domatskiy\SkyparkCDN
+     */
     private $cdn;
+    private $config;
 
     public function setUp()
     {
         $reader = new \Piwik\Ini\IniReader();
-        $config = $reader->readFile(__DIR__.'/config.ini');
+        $this->config = $reader->readFile(__DIR__.'/config.ini');
 
-        if(!isset($config['auth']))
+        if(!isset($this->config['auth']))
             throw new \Exception('no config for auth');
 
-        if(!isset($config['auth']['login']) && !$config['auth']['login'])
+        if(!isset($this->config['auth']['login']) && !$this->config['auth']['login'])
             throw new \Exception('no config login for auth');
 
-        if(!isset($config['auth']['password']) && !$config['auth']['password'])
+        if(!isset($this->config['auth']['password']) && !$this->config['auth']['password'])
             throw new \Exception('no config password for auth');
         
-        var_dump($config);
+        var_dump($this->config);
 
         $this->cdn = new \Domatskiy\SkyparkCDN();
     }
@@ -30,10 +32,21 @@ class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
         $this->cdn = NUll;
     }
 
-    public function testAuth()
+    public function testClass()
     {
-        $response = $this->cdn->signin($config['auth']['login'], $config['auth']['password']);
-        $this->assertInstanceOf(Response::class, $response);
+
+    }
+
+    public function testSignIN()
+    {
+        $response = $this->cdn->signin($this->config['auth']['login'], $this->config['auth']['password']);
+        //$this->assertInstanceOf(Response::class, $response);
+    }
+
+    public function testSignOut()
+    {
+        $response = $this->cdn->signout();
+        //$this->assertInstanceOf(Response::class, $response);
     }
 
 }
