@@ -1,6 +1,8 @@
 <?php
 namespace Domatskiy\Tests;
 
+use Domatskiy\SkyparkCDN;
+
 class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -32,21 +34,37 @@ class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
         $this->cdn = NUll;
     }
 
-    public function testClass()
-    {
-
-    }
-
     public function testSignIN()
     {
         $response = $this->cdn->signin($this->config['auth']['login'], $this->config['auth']['password']);
-        //$this->assertInstanceOf(Response::class, $response);
-    }
+        $this->assertInstanceOf(SkyparkCDN\RequestResult::class, $response);
 
-    public function testSignOut()
-    {
+        var_dump($response);
+
+        $response = $this->cdn->getBalance();
+        $this->assertInstanceOf(SkyparkCDN\RequestResult::class, $response);
+
+        var_dump($response);
+
+        #=========================================================================
+        # resource
+        #=========================================================================
+        if(!isset($this->config['resource']))
+            throw new \Exception('no config for resource');
+
+        if(!isset($this->config['resource']['res_1']) && !$this->config['resource']['res_1'])
+            throw new \Exception('no config res_1 for resource');
+
+        $response = $this->cdn->purgeAll($this->config['resource']['res_1']);
+        $this->assertInstanceOf(SkyparkCDN\RequestResult::class, $response);
+
+        var_dump($response);
+
         $response = $this->cdn->signout();
-        //$this->assertInstanceOf(Response::class, $response);
+        $this->assertInstanceOf(SkyparkCDN\RequestResult::class, $response);
+
+        var_dump($response);
+
     }
 
 }

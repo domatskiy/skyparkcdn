@@ -1,9 +1,17 @@
 <?
 
+/**
+ * based on
+ * https://api-docs.skyparkcdn.com/?lang=ru
+ */
+
 namespace Domatskiy;
 
 class SkyparkCDN
 {
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+
     private $api_url = 'https://capi.skyparkcdn.ru/api/v1';
     private $token = '';
 
@@ -13,17 +21,30 @@ class SkyparkCDN
     }
 
     /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
+
+    /**
      * @param $method
      * @param $url
      * @param array $data
-     * @return RequestResult
+     * @return SkyparkCDN\RequestResult
      */
     private function __request($method, $url, array $data = array())
     {
-        if($this->session_id)
-            $data["SessionId"]= $this->session_id;
-
-        $result = new RequestResult();
+        $result = new SkyparkCDN\RequestResult();
         $result_data = array();
 
         $d = array();
@@ -50,7 +71,7 @@ class SkyparkCDN
 
         $res = $client->request($method, $full_url, [
             'headers' => [
-				'Authorization: Bearer: '.$this->token,
+				'Authorization: Bearer '.$this->token,
 				'Content-Type: application/json'
 				],
             'timeout' => 60,
@@ -58,7 +79,7 @@ class SkyparkCDN
             'json' => $data
             ]);
 
-        if($res->getStatusCode() == 200)
+        if((int)$res->getStatusCode() >= 200 && (int)$res->getStatusCode() <= 226)
         {
             try{
                 $result_data = (array)json_decode($res->getBody(), true);
@@ -85,20 +106,20 @@ class SkyparkCDN
     }
 
     /**
-     * @param $login
+     * @param $email
      * @param $passw
-     * @return RequestResult
+     * @return SkyparkCDN\RequestResult
      */
-    public function login($login, $passw)
+    public function signin($email, $passw)
     {
         $result = $this->__request(self::METHOD_POST, '/auth/signin', [
-            'login' => $login,
+            'email' => $email,
             'password' => $passw
             ]);
 
         $data = $result->getData();
 
-        if(!isset($data['token']))
+        if(!isset($data['token']) || strlen($data['token']) < 150)
             $result->setError(null, 'auth error');
         else
             $this->token = $data['token'];
@@ -106,30 +127,38 @@ class SkyparkCDN
         return $result;
     }
 
-    public function logout()
+    /**
+     * @return SkyparkCDN\RequestResult
+     */
+    public function getBalance()
     {
-        $result = $this->__request(self::METHOD_POST, '/auth/signout');
-        $this->token = '';
-
-        $data = $result->getData();
-
-        if(!isset($data['Success']) || !$data['Success'])
-            $result->setError(0, 'logout error');
+        $result = $this->__request(self::METHOD_GET, '/clients/balance');
 
         return $result;
     }
 
+    /**
+     * @param $resource_id
+     * @return SkyparkCDN\RequestResult
+     * @throws \Exception
+     */
     public function purgeAll($resource_id)
     {
-		if(!is_string($resource_id) || strlen($resource_id) < 1)
-            throw new \Exception('но correct resource_id', 'resource_id');
-		
-        $data = array(
-            'Sendings' => []
-            );
+        if((int)$resource_id < 1)
+            throw new \Exception('nо correct resource_id');
 
         $result = $this->__request(self::METHOD_POST, '/resources/'.$resource_id.'/purgeAll');
 
+        return $result;
+    }
+
+    /**
+     * @return SkyparkCDN\RequestResult
+     */
+    public function signout()
+    {
+        $result = $this->__request(self::METHOD_GET, '/auth/signout');
+        $this->token = '';
         return $result;
     }
 

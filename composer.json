@@ -20,7 +20,7 @@
             "type":"package",
             "package":{
                 "name":"domatskiy/skyparkcdn",
-                "version":"0.1.0",
+                "version":"0.2.0",
                 "source":{
                     "type":"git",
                     "url":"https://github.com/domatskiy/skyparkcdn",
@@ -31,7 +31,7 @@
     ],
     "minimum-stability": "dev",
     "autoload": {
-        "psr-4": { "Domatskiy\\SkyparkCDN\\": "src/" }
+        "psr-4": { "Domatskiy\\": "src/" }
         },
     "autoload-dev": {
         "psr-4": {
