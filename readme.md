@@ -5,10 +5,13 @@
 ```
 $ composer require domatskiy/skyparkcdn
 ```
- 
+
+## use 
 ```
 $cdn = new \Domatskiy\SkyparkCDN();
+ 
 $response = $cdn->signin($email, $password);
+ 
 
 if($response->isSuccess())
 {
@@ -26,3 +29,4 @@ else
 {
     $err = $response->getErrors();
 }
+```
