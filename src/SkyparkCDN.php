@@ -45,7 +45,7 @@ class SkyparkCDN
     private function __request($method, $url, array $data = array())
     {
         $result = new SkyparkCDN\RequestResult();
-        $result_data = array();
+        $result_data = [];
 
         $d = array();
 
@@ -69,15 +69,23 @@ class SkyparkCDN
 
         $client = new \GuzzleHttp\Client();
 
-        $res = $client->request($method, $full_url, [
-            'headers' => [
-				'Authorization: Bearer '.$this->token,
-				'Content-Type: application/json'
-				],
+        $headers = [
+            'Content-Type' => 'application/json'
+            ];
+
+        if($this->token)
+            $headers['Authorization'] = 'Bearer '.$this->token;
+
+        $params = [
+            'headers' => $headers,
             'timeout' => 60,
             'http_errors' => false,
-            'json' => $data
-            ]);
+            ];
+
+        if($method == self::METHOD_POST)
+            $params['json'] = $data;
+
+        $res = $client->request($method, $full_url, $params);
 
         if((int)$res->getStatusCode() >= 200 && (int)$res->getStatusCode() <= 226)
         {
