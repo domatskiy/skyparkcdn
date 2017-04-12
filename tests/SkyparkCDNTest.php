@@ -39,45 +39,46 @@ class SkyparkCDNTest extends \PHPUnit_Framework_TestCase
 
     public function testAPI()
     {
-        $response = $this->cdn->signin($this->config['auth']['email'], $this->config['auth']['password']);
-        $this->assertEquals($response instanceof SkyparkCDN\RequestResult, true);
-        $this->assertArrayHasKey('token', $response->getData());
+        try{
 
-        $data = $response->getData();
-        echo 'token: '.$data['token']."\n\n";
+            $user = $this->cdn->signin($this->config['auth']['email'], $this->config['auth']['password']);
+            echo 'token: '.$user->token."\n\n";
 
-        $result = $this->cdn
-            ->client()
-            ->getBalance();
+            $balance = $this->cdn
+                ->client()
+                ->getBalance();
 
-        print_r($result);
+            $this->assertEquals($balance instanceof SkyparkCDN\Type\Balance, true);
 
-        $this->assertEquals($result instanceof SkyparkCDN\RequestResult, true);
-        $this->assertArrayHasKey('currency', $result->getData());
-        $this->assertArrayHasKey('value', $result->getData());
-        $this->assertArrayHasKey('updatedAt', $result->getData());
+            print_r($balance);
 
-        #=========================================================================
-        # resource
-        #=========================================================================
-        if(!isset($this->config['resource']))
-            throw new \Exception('no config for resource');
+            #=========================================================================
+            # resource
+            #=========================================================================
+            if(!isset($this->config['resource']))
+                throw new \Exception('no config for resource');
 
-        if(!isset($this->config['resource']['res_1']) && !$this->config['resource']['res_1'])
-            throw new \Exception('no config res_1 for resource');
+            if(!isset($this->config['resource']['res_1']) && !$this->config['resource']['res_1'])
+                throw new \Exception('no config res_1 for resource');
 
-        $result = $this->cdn
-            ->cache()
-            ->purgeAll($this->config['resource']['res_1']);
+            $result = $this->cdn
+                ->cache()
+                ->purgeAll($this->config['resource']['res_1']);
 
-        $this->assertEquals($result instanceof SkyparkCDN\RequestResult, true);
+            var_dump($result);
 
-        var_dump($result);
+            $rsOut = $this->cdn->signout();
 
-        $response = $this->cdn->signout();
-        $this->assertEquals($result instanceof SkyparkCDN\RequestResult, true);
 
-        #var_dump($result);
+            #var_dump($result);
+
+        }
+        catch (\Exception $e)
+        {
+            echo $e->getMessage();
+            $this->assertEquals(false, true);
+        }
+
 
     }
 

@@ -8,6 +8,8 @@
 namespace Domatskiy;
 
 use Domatskiy\SkyparkCDN\Request;
+use Domatskiy\SkyparkCDN\Type\Result;
+use Domatskiy\SkyparkCDN\Type\Auth;
 
 class SkyparkCDN extends Request
 {
@@ -16,23 +18,21 @@ class SkyparkCDN extends Request
     /**
      * @param $email
      * @param $passw
-     * @return SkyparkCDN\RequestResult
+     * @return Auth
      */
     public function signin($email, $passw)
     {
-        $result = $this->__request(self::METHOD_POST, '/auth/signin', [
+        /**
+         * @var $res Auth
+         */
+        $res = $this->__request(self::METHOD_POST, '/auth/signin', Auth::class, [
             'email' => $email,
             'password' => $passw
             ]);
 
-        $data = $result->getData();
+        $this->token = $res->token;
 
-        if(!isset($data['token']) || strlen($data['token']) < 150)
-            $result->setError(null, 'auth error');
-        else
-            $this->token = $data['token'];
-
-        return $result;
+        return $res;
     }
 
     public function users()
@@ -52,11 +52,11 @@ class SkyparkCDN extends Request
 
 
     /**
-     * @return SkyparkCDN\RequestResult
+     * @return Result
      */
     public function signout()
     {
-        $result = $this->__request(self::METHOD_GET, '/auth/signout');
+        $result = $this->__request(self::METHOD_GET, '/auth/signout', Result::class);
         $this->token = '';
         return $result;
     }

@@ -2,6 +2,8 @@
 
 namespace Domatskiy\SkyparkCDN;
 
+use Domatskiy\SkyparkCDN\Type\Result;
+
 class Cache extends Method
 {
     /**
@@ -20,7 +22,7 @@ class Cache extends Method
 
     /**
      * @param $resource_id
-     * @return RequestResult
+     * @return Result
      * @throws \Exception
      */
     public function purgeAll($resource_id)
@@ -28,23 +30,19 @@ class Cache extends Method
         if((int)$resource_id < 1)
             throw new \Exception('nо correct resource_id');
 
-        $result = $this->__request(self::METHOD_POST, '/resources/'.$resource_id.'/purgeAll');
-
-        return $result;
+        return $this->__request(self::METHOD_POST, '/resources/'.$resource_id.'/purgeAll', Result::class);
     }
 
     /**
      * @param $resource_id
      * @param array $paths
-     * @return RequestResult
+     * @return Result
      */
     public function prefetch($resource_id, array $paths)
     {
-        $result = $this->__request(self::METHOD_POST, '/resources/'.$resource_id.'/prefetch',[
+        return $this->__request(self::METHOD_POST, '/resources/'.$resource_id.'/prefetch', Result::class, [
             'paths' => $paths
             ]);
-
-        return $result;
     }
 
 

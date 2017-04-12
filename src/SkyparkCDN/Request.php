@@ -2,6 +2,12 @@
 
 namespace Domatskiy\SkyparkCDN;
 
+use Domatskiy\SkyparkCDN\Exception\ForbiddenException;
+use Domatskiy\SkyparkCDN\Exception\NotFoundException;
+use Domatskiy\SkyparkCDN\Exception\ObjectTypeException;
+use Domatskiy\SkyparkCDN\Type\Result;
+use Domatskiy\SkyparkCDN\Type\Type;
+
 class Request
 {
     const METHOD_GET = 'GET';
@@ -32,25 +38,42 @@ class Request
     /**
      * @param $method
      * @param $url
+     * @param $object
      * @param array $data
-     * @return RequestResult
+     * @return mixed
+     * @throws ForbiddenException
+     * @throws NotFoundException
      */
-    protected function __request($method, $url, array $data = array())
+    protected function __request($method, $url, $object, array $data = array())
     {
-        $result = new RequestResult();
-        $result_data = [];
+        $headers = [
+            'Content-Type' => 'application/json'
+            ];
 
-        $d = array();
+        if($this->token)
+            $headers['Authorization'] = 'Bearer '.$this->token;
 
-        foreach($data as $key => $val)
-            $d[] = $key.'='.urlencode($val);
+        $params = [
+            'headers' => $headers,
+            'timeout' => 60,
+            'http_errors' => false,
+            ];
 
         $full_url = $this->api_url.$url;
 
         if($method == self::METHOD_GET)
-            $full_url .= $d ? '?'.http_build_query($d) : '';
+        {
+            $d = array();
 
-        $result->setUrl($full_url);
+            foreach($data as $key => $val)
+                $d[] = $key.'='.urlencode($val);
+
+            $full_url .= $d ? '?'.http_build_query($d) : '';
+        }
+        else
+        {
+            $params['json'] = $data;
+        }
 
         #в запросе указывать Content type равным “application/json”,
         #​ таймаут ожидания выполнения запроса 60 секунд,
@@ -62,47 +85,46 @@ class Request
 
         $client = new \GuzzleHttp\Client();
 
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
-        if($this->token)
-            $headers['Authorization'] = 'Bearer '.$this->token;
-
-        $params = [
-            'headers' => $headers,
-            'timeout' => 60,
-            'http_errors' => false,
-        ];
-
-        if($method == self::METHOD_POST)
-            $params['json'] = $data;
-
         $res = $client->request($method, $full_url, $params);
 
         if((int)$res->getStatusCode() >= 200 && (int)$res->getStatusCode() <= 226)
         {
-            try{
-                $result_data = (array)json_decode($res->getBody(), true);
+            $content_type = $res->getHeader('Content-Type');
 
-                if(!is_array($result_data))
-                    $result_data = array();
+            if(is_array($content_type))
+                $content_type = current($content_type);
 
-            }
-            catch (\Exception $e)
+            if(strpos($content_type, 'application/json') !== false)
             {
-                echo 'Exception: '.$e->getMessage();
-                $result->setError($e->getCode(), $e->getMessage());
+                try{
+                    $result_data = json_decode($res->getBody(), false);
+
+                    try{
+                        return new $object($result_data);
+                    }
+                    catch (\Exception $e){
+                        throw new ObjectTypeException($e->getMessage());
+                    }
+
+                }
+                catch (\Exception $e)
+                {
+
+                    throw new Exception\JsonException('Exception json_decode');
+                }
+
+            }
+            else
+            {
+                return new Result(null);
             }
 
         }
+        elseif($res->getStatusCode() == 403)
+            throw new ForbiddenException('Access forbidden for '.$url);
+        elseif($res->getStatusCode() == 404)
+            throw new NotFoundException('Not found path '.$url);
         else
-        {
-            $result->setError($res->getStatusCode(), 'Err: '.$res->getBody());
-        }
-
-        $result->setData($result_data);
-
-        return $result;
+            throw new NotFoundException($res->getBody().' status '.$res->getStatusCode());
     }
 }

@@ -2,25 +2,23 @@
 
 namespace Domatskiy\SkyparkCDN;
 
+use Domatskiy\SkyparkCDN\Type\Balance;
+
 class Client extends Method
 {
     /**
-     * @return RequestResult
+     * @return Type\Client
      */
-    public function get()
+    public function getClient()
     {
-        $result = $this->__request(self::METHOD_GET, '/clients/me/');
-
-        return $result;
+        return $this->__request(self::METHOD_GET, '/clients/me/', Client::class);
     }
 
     /**
-     * @return RequestResult
+     * @return Type\Balance
      */
     public function getBalance()
     {
-        $result = $this->__request(self::METHOD_GET, '/clients/balance');
-
-        return $result;
+        return $this->__request(self::METHOD_GET, '/clients/balance/', Balance::class);
     }
 }
