@@ -83,7 +83,7 @@ class Request
         if((int)$res->getStatusCode() >= 200 && (int)$res->getStatusCode() <= 226)
         {
             try{
-                $result_data = (array)json_decode($res->getBody(), true);
+                $result_data = json_decode($res->getBody(), true);
 
                 if(!is_array($result_data))
                     $result_data = array();
@@ -91,8 +91,7 @@ class Request
             }
             catch (\Exception $e)
             {
-                echo 'Exception: '.$e->getMessage();
-                $result->setError($e->getCode(), $e->getMessage());
+                new Exception\JsonException();
             }
 
         }
