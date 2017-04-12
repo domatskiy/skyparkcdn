@@ -10,7 +10,7 @@ $ composer require domatskiy/skyparkcdn
 ```
 try{
 
-    $CAuth = $this->cdn->signin($this->config['auth']['email'], $this->config['auth']['password']);
+    $CAuth = $this->cdn->signin($email, $password);
     
     #echo 'token = '.$CAuth->token."\n\n";
 
