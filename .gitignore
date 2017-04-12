@@ -7,3 +7,4 @@ build/artifacts/
 artifacts/
 .idea
 .DS_STORE
+phpunit*.phar
