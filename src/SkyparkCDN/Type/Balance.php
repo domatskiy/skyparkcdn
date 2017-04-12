@@ -2,10 +2,9 @@
 
 namespace Domatskiy\SkyparkCDN\Type;
 
-class Balance
+class Balance extends Type
 {
-    function __construct()
-    {
-
-    }
+    public $currency;
+    public $value;
+    public $updatedAt;
 }
