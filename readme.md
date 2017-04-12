@@ -8,25 +8,28 @@ $ composer require domatskiy/skyparkcdn
 
 ## use 
 ```
-$cdn = new \Domatskiy\SkyparkCDN();
- 
-$response = $cdn->signin($email, $password);
- 
+try{
 
-if($response->isSuccess())
-{
-    # $token = $cdn->getToken();
+    $CAuth = $this->cdn->signin($this->config['auth']['email'], $this->config['auth']['password']);
     
-    $rsBalance = $cdn
-                ->client()
-                ->getBalance();
- 
-    $rsCache = $cdn
-                ->cache()
-                ->purgeAll($res_id);
+    #echo 'token = '.$CAuth->token."\n\n";
+
+    $balance = $this->cdn
+        ->client()
+        ->getBalance();
+
+    print_r($balance);
+
+    $this->cdn
+        ->cache()
+        ->purgeAll($this->config['resource']['res_1']);
+
+    
+    $this->cdn->signout();
 }
-else
+catch (\Exception $e)
 {
-    $err = $response->getErrors();
+    echo $e->getMessage();
 }
+
 ```
